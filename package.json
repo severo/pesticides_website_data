@@ -1,0 +1,31 @@
+{
+  "name": "pesticides_website_data",
+  "version": "1.0.0",
+  "description": "Prepare data for a website on pesticides in drinking water in Brazil",
+  "scripts": {
+    "build": "make all",
+    "clean": "make clean",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/severo/pesticides_website_data.git"
+  },
+  "keywords": [
+    "topojson",
+    "brazil"
+  ],
+  "author": "Sylvain Lesage <severo@rednegra.net>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/severo/pesticides_website_data/issues"
+  },
+  "homepage": "https://github.com/severo/pesticides_website_data#readme",
+  "devDependencies": {
+    "d3-geo-projection": "^2.6.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "ndjson-cli": "^0.3.1",
+    "shapefile": "^0.6.6",
+    "topojson": "^3.0.2"
+  }
+}
