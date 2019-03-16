@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/severo/pesticides_website_data#readme",
   "devDependencies": {
+    "d3-dsv": "^1.1.1",
     "d3-geo-projection": "^2.6.0",
     "eslint-plugin-prettier": "^3.0.1",
     "ndjson-cli": "^0.3.1",

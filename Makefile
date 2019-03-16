@@ -10,6 +10,7 @@ export NODE_OPTIONS
 
 binDir = node_modules/.bin/
 cacheDir = cache/
+inputsDir = inputs/
 tmpDir = tmp/
 finalDir = final/
 
@@ -18,15 +19,20 @@ GEOPROJECT = $(addprefix $(binDir), geoproject)
 NDJSON_SPLIT = $(addprefix $(binDir), ndjson-split)
 NDJSON_MAP = $(addprefix $(binDir), ndjson-map)
 NDJSON_REDUCE = $(addprefix $(binDir), ndjson-reduce)
+NDJSON_JOIN = $(addprefix $(binDir), ndjson-join)
 GEO2TOPO = $(addprefix $(binDir), geo2topo)
 TOPOSIMPLIFY = $(addprefix $(binDir), toposimplify)
 TOPOQUANTIZE = $(addprefix $(binDir), topoquantize)
 TOPOMERGE = $(addprefix $(binDir), topomerge)
 TOPO2GEO = $(addprefix $(binDir), topo2geo)
+CSV2JSON = $(addprefix $(binDir), csv2json)
 
 # The file is in SIRGAS 2000 CRS. The coordinates are exactly the same as in WGS 84, so no reprojections needed (GeoJSON requires WGS84).
 zipUrl = ftp://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2017/Brasil/BR/br_municipios.zip
 zip = $(addprefix $(cacheDir), br.zip)
+
+pop-csv = $(addprefix $(inputsDir), population.csv)
+pop-nd = $(addprefix $(tmpDir), population.ndjson)
 
 shpBase = $(addprefix $(tmpDir), BRMUE250GC_SIR)
 shp = $(addprefix $(shpBase), .shp)
@@ -34,6 +40,7 @@ json = $(addprefix $(tmpDir), br.json)
 px = $(addprefix $(tmpDir), br-px.json)
 px-nd = $(addprefix $(tmpDir), br-px.ndjson)
 ibge-px-nd = $(addprefix $(tmpDir), br-ibge-px.ndjson)
+attr-pop-px-nd = $(addprefix $(tmpDir), br-attr-pop-px.ndjson)
 attr-px-nd = $(addprefix $(tmpDir), br-attr-px.ndjson)
 attr-px-topo = $(addprefix $(tmpDir), br-attr-px-topo.json)
 simple-px-topo = $(addprefix $(tmpDir), br-simple-px-topo.json)
@@ -72,9 +79,18 @@ $(ibge-px-nd): $(px-nd)
 	# Compute the IBGE code, and only keep this property
 	$(NDJSON_MAP) 'd.properties = {ibgeCode: d.properties.CD_GEOCMU.slice(0,6)}, d' < $(px-nd) > $(ibge-px-nd)
 
-$(attr-px-nd): $(ibge-px-nd)
+$(pop-nd): $(pop-csv)
+	# Convert CSV population file to ND JSON
+	$(CSV2JSON) -n < $(pop-csv) > $(pop-nd)
+
+$(attr-pop-px-nd): $(ibge-px-nd) $(pop-nd)
+	$(NDJSON_JOIN) 'd.properties.ibgeCode' 'd["COD. UF"]+d["COD. MUNIC"].slice(0,4)' $(ibge-px-nd) $(pop-nd) | \
+	$(NDJSON_MAP) 'd[0].properties = {ibgeCode: d[0].properties.ibgeCode, fu: d[1]["UF"], fuCode: d[1]["COD. UF"], name: d[1]["NOME DO MUNICÍPIO"], population: d[1]["POPULAÇÃO ESTIMADA"]}, d[0]' \
+  > $(attr-pop-px-nd)
+
+$(attr-px-nd): $(attr-pop-px-nd)
 	# TODO: Merge with the statistics data
-	cp $(ibge-px-nd) $(attr-px-nd)
+	cp $(attr-pop-px-nd) $(attr-px-nd)
 
 $(attr-px-topo): $(attr-px-nd)
 	# Convert from ND GeoJson to TopoJSON format (set the geometries under the
@@ -85,6 +101,7 @@ $(attr-px-topo): $(attr-px-nd)
 $(simple-px-topo): $(attr-px-topo)
 	# Simplify, removing "triangles areas" below 1 px²
 	# TODO: also prepare a 0.01px² file, in case we use zoom on municipalities
+	#$(TOPOSIMPLIFY) -p 0.01 < $(attr-px-topo) > $(simple-px-topo)
 	$(TOPOSIMPLIFY) -p 1 < $(attr-px-topo) > $(simple-px-topo)
 
 $(quantized-px-topo): $(simple-px-topo)
