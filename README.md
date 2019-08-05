@@ -178,7 +178,7 @@ The methodology is described in the Makefile comments.
 - add `republic`, `federative-units` (states) and `internal-federative-units`
   geometries
 
-Technology used:
+### Technology used
 
 - npm to install the required packages: [d3-dsv](https://github.com/d3/d3-dsv),
   [d3-geo-projection](https://github.com/d3/d3-geo-projection/),
@@ -187,7 +187,7 @@ Technology used:
   [topojson](https://github.com/topojson/topojson)
 - Makefile to coordinate the data building processes
 
-Based on the work by:
+### Based on the work by
 
 - Mike Bostock,
   https://medium.com/@mbostock/command-line-cartography-part-1-897aa8f8ca2c
