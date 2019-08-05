@@ -12,7 +12,7 @@ binDir = node_modules/.bin/
 cacheDir = cache/
 inputsDir = inputs/
 tmpDir = tmp/
-finalDir = final/
+finalDir = data/
 
 SHP2JSON = $(addprefix $(binDir), shp2json)
 GEOPROJECT = $(addprefix $(binDir), geoproject)
