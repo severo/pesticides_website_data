@@ -38,7 +38,7 @@ data visualization, on pesticides in Brazil.
   }
   ```
 
-### Municipalities
+### Municipalities
 
 The data contain the geographic limits of the Brazil municipalities, as defined
 by the official Brazilian institute (IPGE), as well as some metadata. For
@@ -79,7 +79,7 @@ with:
 - "name": name of the municipality
 - "population": estimated population (source IBGE 2018)
 
-### States
+### States
 
 To get access to the states data:
 
